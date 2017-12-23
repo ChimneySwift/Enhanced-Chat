@@ -1,4 +1,4 @@
-local data = minetest.get_mod_storage()
+local modstorage = minetest.get_mod_storage()
 local dColor = "#00FF00"
 
 local chatSource = function(msg) -- Find out who was talking to us
@@ -20,7 +20,7 @@ minetest.register_chatcommand("setcolor", { -- Assign a colour to chat messages 
 		local key = "player_" .. args[1] -- The setting name to set
 		local color = args[2]
 		if not color then color = dcolor end-- If a colour was not specified, use the default colour.
-		data:set_string(key, color)
+		modstorage:set_string(key, color)
 		minetest.display_chat_message("Player color set sucessfully!")
 	end
 })
@@ -30,7 +30,7 @@ minetest.register_chatcommand("delcolor", {
 	description = "Set a specified player's chat messages to the default colour",
 	func = function(param)
 		local key = "player_" .. param
-		data:set_string(key, nil) -- Delete the key
+		modstorage:set_string(key, nil) -- Delete the key
 		minetest.display_chat_message("Player color set sucessfully!")
 	end
 })
@@ -39,7 +39,7 @@ minetest.register_chatcommand("listcolors", {
 	params = "",
 	description = "List player/colour pairs",
 	func = function(param)
-		local list = data:to_table().fields
+		local list = modstorage:to_table().fields
 		for key,value in pairs(list) do -- Get key and value for all pairs
 			if string.sub(key, 1, 7) == "player_" then -- Might prevent future problems
 				key = string.sub(key, 8, string.len(key)) -- Isolate the player name
@@ -55,7 +55,7 @@ minetest.register_on_connect(function()
 		local sender = chatSource(msgPlain)
 		
 		if string.sub(msgPlain, 1, 2) == "# " then -- /status message
-			local list = data:to_table().fields
+			local list = modstorage:to_table().fields
 			for key,value in pairs(list) do -- Get key and value for all pairs
 				if string.sub(key, 1, 7) == "player_" then -- Might prevent future problems
 					key = string.sub(key, 8, string.len(key)) -- Isolate the player name
@@ -66,7 +66,7 @@ minetest.register_on_connect(function()
 			return true
 		elseif sender then -- Normal player messages
 			local setKey = "player_" .. sender -- The setting name
-			local color = data:get_string(setKey) -- Get the desired colour
+			local color = modstorage:get_string(setKey) -- Get the desired colour
 			if color == "" then return end -- If no colour, set to default
 			message = minetest.colorize(color, msgPlain)
 			minetest.display_chat_message(message)
